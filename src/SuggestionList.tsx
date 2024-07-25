@@ -55,7 +55,7 @@ class SuggestionList extends React.Component<SuggestionProps, SuggestionsState> 
                             <Typography sx={{color: 'text.secondary'}}>
                                 {suggestion.explanation}
                             </Typography>
-                            <Button onClick={() => {window.open(suggestion.source); console.log(suggestion.source)}}>
+                            <Button onClick={() => {window.open(suggestion.link); console.log(suggestion.link)}}>
                                 Learn More
                             </Button>
                             <Button onClick={() => this.props.onAccept(suggestion.text)}>
