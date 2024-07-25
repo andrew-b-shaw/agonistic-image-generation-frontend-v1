@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/agonistic-image-generation-frontend/static/css/main.b4730902.css",
-    "main.js": "/agonistic-image-generation-frontend/static/js/main.a811afbd.js",
+    "main.js": "/agonistic-image-generation-frontend/static/js/main.daeb6900.js",
     "static/js/453.d855a71b.chunk.js": "/agonistic-image-generation-frontend/static/js/453.d855a71b.chunk.js",
     "index.html": "/agonistic-image-generation-frontend/index.html",
     "main.b4730902.css.map": "/agonistic-image-generation-frontend/static/css/main.b4730902.css.map",
-    "main.a811afbd.js.map": "/agonistic-image-generation-frontend/static/js/main.a811afbd.js.map",
+    "main.daeb6900.js.map": "/agonistic-image-generation-frontend/static/js/main.daeb6900.js.map",
     "453.d855a71b.chunk.js.map": "/agonistic-image-generation-frontend/static/js/453.d855a71b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b4730902.css",
-    "static/js/main.a811afbd.js"
+    "static/js/main.daeb6900.js"
   ]
 }
