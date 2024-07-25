@@ -1,7 +1,7 @@
 interface Suggestion {
     text: string
     explanation: string
-    link: string
+    source: string
     x: number
     y: number
 }

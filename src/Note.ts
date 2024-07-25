@@ -1,6 +1,7 @@
 interface Note {
-    term: string
+    phrase: string
     annotation: string
+    disabled: boolean
 }
 
 export default Note;

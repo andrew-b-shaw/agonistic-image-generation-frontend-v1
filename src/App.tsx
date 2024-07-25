@@ -1,13 +1,17 @@
 import React from "react";
 import NoteCard from "./NoteCard";
-import {TextField, CssBaseline, Button, CircularProgress, Modal, Box} from "@mui/material";
-import SuggestionGraph from "./SuggestionGraph";
+import {CssBaseline, Button, CircularProgress, Modal, Box} from "@mui/material";
+import SuggestionList from "./SuggestionList";
 import UserTextField from "./UserTextField";
+import Suggestion from "./Suggestion";
+import Note from "./Note";
+
+const URL: string = "http://127.0.0.1:5000/"; // "https://app-cqcqomtita-wl.a.run.app/";
 
 interface AppState {
     prompt: string
-    notes: any // Map of term (string) to annotation (string)
-    suggestions: any // Map of term (string) to array of Suggestions
+    notes: {[k: string]: Note} // Map of phrase (string) to array of Notes
+    suggestions: {[k: string]: Suggestion[]} // Map of phrase (string) to array of Suggestions
     focus: string
     image: string
     modalOpen: boolean
@@ -15,7 +19,6 @@ interface AppState {
 }
 
 class App extends React.Component<{}, AppState> {
-
     constructor(props: any) {
         super(props);
         this.state = {
@@ -37,13 +40,16 @@ class App extends React.Component<{}, AppState> {
             prompt: text
         });
 
-        let response = await fetch("http://127.0.0.1:5000/negotiate/" + text);
-        let notes: object = {}
-        let suggestions = await response.json();
+        let response = await fetch(URL + "negotiate/" + text);
+        let notes: {[k: string]: Note} = {}
+        let suggestions: {[k: string]: Suggestion[]} = await response.json();
 
-        for (let term in suggestions) {
-            // @ts-ignore
-            notes[term] = "";
+        for (let phrase in suggestions) {
+            notes[phrase] = {
+                phrase: phrase,
+                annotation: "",
+                disabled: false
+            };
         }
 
         this.setState({
@@ -53,43 +59,38 @@ class App extends React.Component<{}, AppState> {
         });
     }
 
-    handleNoteClick = (term: string) => {
-        this.setState({focus: term});
+    handleNoteClear = (phrase: string) => {
+        let notes = {...this.state.notes};
+        notes[phrase].annotation = "";
+        this.setState({notes: notes});
+    }
+
+    handleNoteAdd = (phrase: string) => {
+        if (!Object.hasOwn(this.state.notes, phrase)) {
+            let notes = {...this.state.notes}
+            let suggestions = {...this.state.suggestions}
+
+            notes[phrase] = {
+                phrase: phrase,
+                annotation: "",
+                disabled: false
+            };
+            suggestions[phrase] = [];
+
+            this.setState({
+                notes: notes,
+                suggestions: suggestions
+            });
+        }
     }
 
     handleSuggestionAccept = async (text: string) => {
         let notes = {...this.state.notes};
-        notes[this.state.focus] = text;
+        notes[this.state.focus].annotation = text;
         this.setState({
             notes: notes,
             focus: "",
-            //notesLoading: true
         })
-
-        // let formData = new FormData();
-        // formData.append("annotation", text)
-        // // @ts-ignore
-        // formData.append("prompt", this.state.prompt);
-        // formData.append("notes", JSON.stringify(this.state.notes));
-        //
-        // let response = await fetch("http://127.0.0.1:5000/iterate", {
-        //     method: 'POST',
-        //     body: formData
-        // });
-        //
-        // let suggestions = await response.json();
-        // for (let term in suggestions) {
-        //     if (!Object.hasOwn(this.state.notes, term)) {
-        //         this.state.notes[term] = "";
-        //         this.state.suggsetions[term] = suggestions[term];
-        //     }
-        // }
-        //
-        // this.setState({
-        //     notes: {...this.state.notes},
-        //     suggestions: {...this.state.suggestions},
-        //     notesLoading: false
-        // });
     }
 
     handleGenerate = async () => {
@@ -99,11 +100,10 @@ class App extends React.Component<{}, AppState> {
         });
 
         let formData = new FormData();
-        // @ts-ignore
         formData.append("prompt", this.state.prompt);
         formData.append("notes", JSON.stringify(this.state.notes));
 
-        let response = await fetch("http://127.0.0.1:5000/generate", {
+        let response = await fetch(URL + "generate", {
             method: 'POST',
             body: formData
         });
@@ -114,23 +114,41 @@ class App extends React.Component<{}, AppState> {
         });
     }
 
-    handleNoteClear = (term: string) => {
-        this.state.notes[term] = "";
-        this.setState({notes: {...this.state.notes}});
-    }
 
-    handleNoteAdd = (term: string) => {
-        let notes = {...this.state.notes}
-        let suggestions = {...this.state.suggestions}
-
-        notes[term] = "";
-        suggestions[term] = [];
-
-        this.setState({
-            notes: notes,
-            suggestions: suggestions
-        });
-    }
+    // handleIterate = async () => {
+    //     let formData = new FormData();
+    //     formData.append("prompt", this.state.prompt);
+    //     formData.append("notes", JSON.stringify(this.state.notes));
+    //
+    //     let response = await fetch(URL + "iterate", {
+    //         method: 'POST',
+    //         body: formData
+    //     });
+    //
+    //     let notes = {...this.state.notes};
+    //     let suggestions = {...this.state.suggestions};
+    //     for (let phrase in Object.keys(notes)) {
+    //         notes[phrase].disabled = true;
+    //     }
+    //
+    //     let new_suggestions: {[k: string]: Suggestion[]} = await response.json();
+    //     for (let phrase in new_suggestions) {
+    //         if (!Object.hasOwn(this.state.notes, phrase)) {
+    //             this.state.notes[phrase] = {
+    //                 phrase: phrase,
+    //                 annotation: "",
+    //                 disabled: false
+    //             };
+    //             suggestions[phrase] = new_suggestions[phrase];
+    //         }
+    //     }
+    //
+    //     this.setState({
+    //         notes: {...this.state.notes},
+    //         suggestions: {...this.state.suggestions},
+    //         notesLoading: false
+    //     });
+    // }
 
     render() {
         return (
@@ -150,18 +168,18 @@ class App extends React.Component<{}, AppState> {
                                 <h1>Notes</h1>
                                 {Object.keys(this.state.notes).length > 0 && (
                                     <div>
-                                        {Object.keys(this.state.notes).map(term => (
+                                        {Object.values(this.state.notes).map(note => (
                                             <NoteCard
-                                                term={term}
-                                                annotation={this.state.notes[term]}
-                                                onClick={this.handleNoteClick}
+                                                note={note}
+                                                onClick={(phrase) => this.setState({focus: phrase})}
                                                 onClear={this.handleNoteClear}
                                             />
                                         ))}
-                                        {/*<UserTextField*/}
-                                        {/*    placeholder="Enter your own note..."*/}
-                                        {/*    onAccept={this.handleNoteAdd}*/}
-                                        {/*/>*/}
+                                        <UserTextField
+                                            placeholder="Enter your own note..."
+                                            onAccept={this.handleNoteAdd}
+                                            sx={{width: 400}}
+                                        />
                                     </div>
                                 )}
                                 {this.state.notesLoading && <CircularProgress sx={{my: 2}}/>}
@@ -171,7 +189,7 @@ class App extends React.Component<{}, AppState> {
                                 <h1>Suggestions</h1>
                                 {this.state.focus && (
                                     <div>
-                                        <SuggestionGraph
+                                        <SuggestionList
                                             phrase={this.state.focus}
                                             suggestions={this.state.suggestions[this.state.focus]}
                                             onAccept={this.handleSuggestionAccept}
@@ -197,7 +215,7 @@ class App extends React.Component<{}, AppState> {
 
                         <Modal
                             open={this.state.modalOpen}
-                            onClose={(e) => this.setState({modalOpen: false})}
+                            onClose={() => this.setState({modalOpen: false})}
                         >
                             <Box sx={{
                                 height: 0.5,
@@ -217,18 +235,16 @@ class App extends React.Component<{}, AppState> {
                                     left: 0,
                                     right: 0
                                 }}/>}
-                                {this.state.image != "" &&
-                                    <img
-                                        src={this.state.image}
-                                        alt={this.state.prompt}
-                                        className="generated-img"
-                                        style={{
-                                            height: "100%",
-                                            width: "100%",
-                                            objectFit: "contain"
+                                {this.state.image !== "" && <img
+                                    src={this.state.image}
+                                    alt={this.state.prompt}
+                                    className="generated-img"
+                                    style={{
+                                        height: "100%",
+                                        width: "100%",
+                                        objectFit: "contain"
                                     }}
-                                    />
-                                }
+                                />}
                             </Box>
                         </Modal>
                     </div>
