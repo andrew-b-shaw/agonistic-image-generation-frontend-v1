@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/agonistic-image-generation-frontend-v1/static/css/main.b4730902.css",
-    "main.js": "/agonistic-image-generation-frontend-v1/static/js/main.e479ce91.js",
+    "main.css": "/agonistic-image-generation-frontend-v1/static/css/main.bbf64418.css",
+    "main.js": "/agonistic-image-generation-frontend-v1/static/js/main.019a1d89.js",
     "static/js/453.d855a71b.chunk.js": "/agonistic-image-generation-frontend-v1/static/js/453.d855a71b.chunk.js",
     "index.html": "/agonistic-image-generation-frontend-v1/index.html",
-    "main.b4730902.css.map": "/agonistic-image-generation-frontend-v1/static/css/main.b4730902.css.map",
-    "main.e479ce91.js.map": "/agonistic-image-generation-frontend-v1/static/js/main.e479ce91.js.map",
+    "main.bbf64418.css.map": "/agonistic-image-generation-frontend-v1/static/css/main.bbf64418.css.map",
+    "main.019a1d89.js.map": "/agonistic-image-generation-frontend-v1/static/js/main.019a1d89.js.map",
     "453.d855a71b.chunk.js.map": "/agonistic-image-generation-frontend-v1/static/js/453.d855a71b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b4730902.css",
-    "static/js/main.e479ce91.js"
+    "static/css/main.bbf64418.css",
+    "static/js/main.019a1d89.js"
   ]
 }
